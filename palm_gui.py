@@ -1,29 +1,25 @@
-"""Graphical user interface for palm_3d. Version 0.1.2, build 2
+"""Graphical user interface for palm_3d. Version 0.1.2, build 4
 Written by Andrew York and Kenneth Arcieri"""
-import os, re, tkFileDialog, tkSimpleDialog, tkFont, subprocess, palm_3d
+import os, re, subprocess, palm_3d
+import tkFileDialog, tkSimpleDialog, tkMessageBox, tkFont
 import Tkinter as tk
 
-if os.name == 'posix':
-    def ipython_run(script, waitForIt=False):
-        cmd=['gnome-terminal', '-t', 'palm3d subprocess', '--disable-factory',
+basedir = os.getcwd()
+def ipython_run(script, waitForIt=False):
+    if os.name == 'posix':
+        cmd = ['gnome-terminal', '-t', 'palm3d subprocess', '--disable-factory',
              '-e', """ipython -pylab -c 'run "%s"'"""%(script)]
-        print cmd
-        proc = subprocess.Popen(cmd)
-        if waitForIt:
-            proc.communicate()
-        return proc
-elif os.name == 'nt':
-    basedir = os.getcwd()
-    def ipython_run(script, waitForIt=False):
+    elif os.name == 'nt':
         cmd = [
             os.path.join(basedir, "portablepython", "App", "python.exe"),
-            os.path.join(basedir, "portablepython", "App", "Scripts", "ipython"),
+            os.path.join(
+                basedir, "portablepython", "App", "Scripts", "ipython"),
             "-pylab", "-c", 'run "%s"'%(script)]
-        print cmd
-        proc = subprocess.Popen(cmd)
-        if waitForIt:
-            proc.communicate()
-        return proc
+    print cmd
+    proc = subprocess.Popen(cmd)
+    if waitForIt:
+        proc.communicate()
+    return proc
 
 class Gui:
     def __init__(self, root):
@@ -540,6 +536,10 @@ except:
                 folder=self.experimentFolder, keys=keys, dtype=float)
             if metadata is None:
                 return None
+        linkedInput = tkMessageBox.askyesnocancel(
+            title="Linking", message="Use linked input?")
+        if linkedInput is None:
+            return None
         with open('plots.py', 'wb') as histScript:
             histScript.write(
 """try:
@@ -591,7 +591,7 @@ except:
                     maxY=metadata['maximum_y:'],
                     minZ=metadata['minimum_z:'],
                     maxZ=metadata['maximum_z:'],
-                    linkedInput='False'))
+                    linkedInput=str(linkedInput)))
             ipython_run('plots.py')
             return None
     
