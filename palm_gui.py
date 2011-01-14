@@ -493,8 +493,11 @@ except:
         return None
 
     def construct_histogram(self, event=None):
-        acquisitions = [f for f in self.dataFolders
-                        if f.get('include_in_histogram', False)]
+        acquisitions = []
+        for f in self.dataFolders:
+            if f.get('include_in_histogram', False): #Variable exists
+                if f.get('include_in_histogram').get(): #Variable is true
+                    acquisitions.append(f)
         acquisitionStr = ''.join(
             [' '*8 + "'" + f['file_prefix'] + "palm_acquisition.pkl',\n"
              for f in acquisitions])
