@@ -523,78 +523,79 @@ def load_palm(fileName = 'palm_acquisition.pkl', verbose=True):
             protocol=2)
         delattr(palm_acquisition, 'stored_histograms')
         palm_acquisition.save()
-    """LEGACY. THIS SHOULD NO LONGER BE NECESSARY:
-    Check for old-style analysis, updating from old-style to
-    new-style data if required:"""
-    for attr in ('candidates_filename', 'localizations_filename',
-                 'linked_localizations_filename', 'particles_filename'):
-        if hasattr(palm_acquisition, attr):
-            oldShelfName = getattr(palm_acquisition, attr)
-            if verbose: print attr + ":", oldShelfName
-##            print "Exists:", os.path.exists(os.path.join(
-##                palm_acquisition.imFolder, oldShelfName))
-            newShelfName = oldShelfName + "_NEW"
-            if os.path.exists(os.path.join(
-                palm_acquisition.imFolder, oldShelfName)):
-                oldShelf = shelve.open(os.path.join(
-                    palm_acquisition.imFolder, oldShelfName), protocol=2)
-##                print "'0' in old shelve:", ('0' in oldShelf)
-                if '0' in oldShelf:
-                    if isinstance(oldShelf['0'], types.ListType):
-                        ##New-style data, do nothing
-##                        print "Not converting."
-                        oldShelf.close()
-                        oldShelf=None
-                    elif isinstance(oldShelf['0'], types.DictType):
-                        """Old-style data. Convert into new style:"""
-                        print "Converting", oldShelfName, "to", newShelfName
-                        newShelf = shelve.open(os.path.join(
-                            palm_acquisition.imFolder,
-                            newShelfName), protocol=2)
-                        locNum = 0
-                        loc = oldShelf['0']
-                        print oldShelf['num'], "localizations."
-                        for imNum in xrange(len(palm_acquisition.images)):
-                            locList = []
-                            while loc['image_num'] == imNum:
-                                locList.append(dict(loc))
-                                locNum += 1
-                                loc = oldShelf.get( #Default breaks loop
-                                    repr(locNum), {'image_num': None})
-                            newShelf[repr(imNum)] = locList
-                            if ((imNum%50 == 0) or
-                                (imNum == len(palm_acquisition.images)-1)):
-                                sys.stdout.write(
-                                    "\rCopying key: %s"%(locNum - 1))
-                                sys.stdout.flush()
-                                newShelf.sync()
-                                oldShelf.sync()
-                        print ""
-                        for key in oldShelf.keys():
-                            try:
-                                int(key)
-                            except ValueError:
-                                print "Copying key:", key
-                                newShelf[key] = oldShelf[key]
-                                oldShelf.sync()
-                                newShelf.sync()
-                        newShelf.close()
-                        newShelf = None
-                        oldShelf.close()
-                        oldShelf=None
-                        os.rename(os.path.join(palm_acquisition.imFolder,
-                                               oldShelfName),
-                                  os.path.join(palm_acquisition.imFolder,
-                                               "OLD_" + oldShelfName))
-                        os.rename(os.path.join(palm_acquisition.imFolder,
-                                               newShelfName),
-                                  os.path.join(palm_acquisition.imFolder,
-                                               oldShelfName))
-                    else:
-                        print "Neither a dict nor a list!"
-                        print "Keys:", oldShelf.keys()
-                        oldShelf.close()
-                        oldShelf=None
+    """OK, finally deprecating the block of legacy code to speed loading:"""
+##    """LEGACY. THIS SHOULD NO LONGER BE NECESSARY:
+##    Check for old-style analysis, updating from old-style to
+##    new-style data if required:"""
+##    for attr in ('candidates_filename', 'localizations_filename',
+##                 'linked_localizations_filename', 'particles_filename'):
+##        if hasattr(palm_acquisition, attr):
+##            oldShelfName = getattr(palm_acquisition, attr)
+##            if verbose: print attr + ":", oldShelfName
+####            print "Exists:", os.path.exists(os.path.join(
+####                palm_acquisition.imFolder, oldShelfName))
+##            newShelfName = oldShelfName + "_NEW"
+##            if os.path.exists(os.path.join(
+##                palm_acquisition.imFolder, oldShelfName)):
+##                oldShelf = shelve.open(os.path.join(
+##                    palm_acquisition.imFolder, oldShelfName), protocol=2)
+####                print "'0' in old shelve:", ('0' in oldShelf)
+##                if '0' in oldShelf:
+##                    if isinstance(oldShelf['0'], types.ListType):
+##                        ##New-style data, do nothing
+####                        print "Not converting."
+##                        oldShelf.close()
+##                        oldShelf=None
+##                    elif isinstance(oldShelf['0'], types.DictType):
+##                        """Old-style data. Convert into new style:"""
+##                        print "Converting", oldShelfName, "to", newShelfName
+##                        newShelf = shelve.open(os.path.join(
+##                            palm_acquisition.imFolder,
+##                            newShelfName), protocol=2)
+##                        locNum = 0
+##                        loc = oldShelf['0']
+##                        print oldShelf['num'], "localizations."
+##                        for imNum in xrange(len(palm_acquisition.images)):
+##                            locList = []
+##                            while loc['image_num'] == imNum:
+##                                locList.append(dict(loc))
+##                                locNum += 1
+##                                loc = oldShelf.get( #Default breaks loop
+##                                    repr(locNum), {'image_num': None})
+##                            newShelf[repr(imNum)] = locList
+##                            if ((imNum%50 == 0) or
+##                                (imNum == len(palm_acquisition.images)-1)):
+##                                sys.stdout.write(
+##                                    "\rCopying key: %s"%(locNum - 1))
+##                                sys.stdout.flush()
+##                                newShelf.sync()
+##                                oldShelf.sync()
+##                        print ""
+##                        for key in oldShelf.keys():
+##                            try:
+##                                int(key)
+##                            except ValueError:
+##                                print "Copying key:", key
+##                                newShelf[key] = oldShelf[key]
+##                                oldShelf.sync()
+##                                newShelf.sync()
+##                        newShelf.close()
+##                        newShelf = None
+##                        oldShelf.close()
+##                        oldShelf=None
+##                        os.rename(os.path.join(palm_acquisition.imFolder,
+##                                               oldShelfName),
+##                                  os.path.join(palm_acquisition.imFolder,
+##                                               "OLD_" + oldShelfName))
+##                        os.rename(os.path.join(palm_acquisition.imFolder,
+##                                               newShelfName),
+##                                  os.path.join(palm_acquisition.imFolder,
+##                                               oldShelfName))
+##                    else:
+##                        print "Neither a dict nor a list!"
+##                        print "Keys:", oldShelf.keys()
+##                        oldShelf.close()
+##                        oldShelf=None
     return palm_acquisition
 
 class Palm_3d:
