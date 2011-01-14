@@ -288,6 +288,14 @@ class Gui:
         return None
 
     def get_acquisition_data(self):
+        """palm_3d.load_palm() is too expensive to call every time we
+        refresh the palm_gui window. Store the results for faster
+        loading."""
+        old_load_cache = dict(getattr(self, 'load_palm_cache', {}))
+        self.load_palm_cache = {}
+        """Keys: Palm acquisition filenames. Values: (acq, mtime),
+        where acq is the loaded palm acquisition, and mtime is the
+        time that file was last modified."""
         """
         Get acquisition name and file prefix:
         """
@@ -316,26 +324,37 @@ class Gui:
             """
             Get progress information:
             """
+            acq = fol['file_prefix'] + 'palm_acquisition.pkl'
             try:
-                data = palm_3d.load_palm(
-                    fol['file_prefix'] + 'palm_acquisition.pkl',
-                    verbose=False)
-                fol['progress'] = 'Started'
-                for attr, prog in (
-                    ('candidates_filename', 'Candidate selection'),
-                    ('localizations_filename', 'Localizing candidates'),
-                    ('linked_localizations_filename', 'Linking'),
-                    ('particles_filename', 'Relocalizing')):
-                    if os.path.exists(os.path.join(
-                        data.imFolder, getattr(data, attr, 'xNOSUCHFILE'))):
-                        fol['progress'] = prog
-                if os.path.exists(getattr(
-                    data, 'fiducial_filter_filename', 'NOSUCHFILE')):
-                    fol['progress'] = 'Drift correction'
-                if getattr(data, 'drift', None) != None:
-                    fol['progress'] = 'Done'
-            except IOError:
+                mtime = os.path.getmtime(acq)
+            except OSError:
                 fol['progress'] = ''
+                continue
+            if (acq in old_load_cache and mtime == old_load_cache[acq][1]):
+                data = old_load_cache[acq][0]
+                print "Using stored palm data"
+            else:
+                try:
+                    data = palm_3d.load_palm(acq, verbose=False)
+                    print "Loading palm data"
+                except IOError:
+                    fol['progress'] = ''
+                    continue
+            self.load_palm_cache[acq] = (data, mtime)
+            fol['progress'] = 'Started'
+            for attr, prog in (
+                ('candidates_filename', 'Candidate selection'),
+                ('localizations_filename', 'Localizing candidates'),
+                ('linked_localizations_filename', 'Linking'),
+                ('particles_filename', 'Relocalizing')):
+                if os.path.exists(os.path.join(
+                    data.imFolder, getattr(data, attr, 'xNOSUCHFILE'))):
+                    fol['progress'] = prog
+            if os.path.exists(getattr(
+                data, 'fiducial_filter_filename', 'NOSUCHFILE')):
+                fol['progress'] = 'Drift correction'
+            if getattr(data, 'drift', None) != None:
+                fol['progress'] = 'Done'
         return None
 
     def get_metadata(self, folder, keys, dtype=int):
