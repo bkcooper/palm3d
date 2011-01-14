@@ -9,7 +9,7 @@ version={
     'major': 1,
     'minor': 7,
     'revision': 2,
-    'build': 2}
+    'build': 3}
 import os
 from scipy.ndimage import gaussian_laplace
 
@@ -844,8 +844,8 @@ class Palm_3d:
         
         if fileName is None:
             fileName = self.save_filename
-        print "Saving ", fileName, "..."
         if os.path.isfile(fileName) and overwriteWarning:
+            print "Saving ", fileName, "..."
             print "The file '" + fileName + "'",
             print "already exists. Overwrite? y/[n]:",
             overwrite_acquisition = raw_input()
@@ -2282,7 +2282,7 @@ class Palm_3d:
             'initial_xyz': (
                 x_nd[whichFid][0], y_nd[whichFid][0], z_nd[whichFid][0])}
         print "Drift correction determined."
-        self.save()
+        self.save(overwriteWarning=False)
         return None
 
     def localize_individual_images(
