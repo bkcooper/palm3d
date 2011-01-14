@@ -572,6 +572,16 @@ except:
 
     import pylab
     pylab.close('all') ##To prevent a funky Windows error message
+except (MemoryError, ValueError):
+    import traceback
+    traceback.print_exc()
+    print "\\nA memory error or value error",
+    print "often means the histogram is too big."
+    print "You can make a smaller histogram by:"
+    print "(a) Increasing 'nanometers_per_histogram_bin'"
+    print "(b) Increasing 'minimum_x', 'minimum_y', or 'minimum_z'"
+    print "(c) Decreasing 'maximum_x', 'maximum_y', or 'maximum_z'"
+    raw_input()
 except:
     import traceback
     traceback.print_exc()
