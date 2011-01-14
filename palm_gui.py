@@ -1,4 +1,4 @@
-"""Graphical user interface for palm_3d. Version 0.1.2, build 4
+"""Graphical user interface for palm_3d. Version 0.1.2, build 5
 Written by Andrew York and Kenneth Arcieri"""
 import os, re, subprocess, palm_3d
 import tkFileDialog, tkSimpleDialog, tkMessageBox, tkFont
@@ -473,7 +473,8 @@ pylab.close('all') ##To prevent a funky Windows error
         if os.path.splitext(f)[-1] == '.dat':
             num += 1
             if num > 2 * repetitions:
-                print "Extra images found! Check that 'repetitions' is correct."
+                print "\\nExtra images found!"
+                print "Check that 'repetitions' is correct.\\n"
                 break
             if num%2 == 1: #Every other file is slice data
                 for i in range(slice_images_per_file):
@@ -483,6 +484,9 @@ pylab.close('all') ##To prevent a funky Windows error
                 for i in range(tracking_images_per_file):
                     images.append(f+'*%i'%(i))
                     im_z_positions[images[-1]] = 0
+    if num < 2 * repetitions:
+        print "\\nFewer images than expected!"
+        print "Check that 'repetitions' is correct.\\n"
 
     data = palm_3d.new_palm(
         images=images,
