@@ -117,18 +117,6 @@ class Gui:
             0, 0, self.root.winfo_width(), self.root.winfo_height()))
         return None
 
-##    def warning_box(self, text, title):
-##        b = tk.Toplevel(self.root)
-##        b.title(title)
-##        msg = tk.Message(
-##            b, text=text)
-##        msg.pack()
-##        button = tk.Button(b, text="Ok", command=b.destroy)
-##        button.pack()
-##        button.focus_set()
-##        button.bind("<Return>", lambda e: b.destroy())
-##        return None
-
     def select_experiment_folder(self, event=None):
         self.experimentFolder = tkFileDialog.askdirectory(
             title="Where is the PALM data?")
@@ -252,27 +240,26 @@ class Gui:
                 b.bind("<Return>", (
                     None, lambda e, f=fol: self.process_palm(f))[hasMetadata])
                 b.grid(row=f+2, column=4, sticky='w')
-
-                try:
-                    data = palm_3d.load_palm(
-                        fol['file_prefix'] + 'palm_acquisition.pkl',
-                        verbose=False)
-                    fol['progress'] = 'Started'
-                    for attr, prog in (
-                        ('candidates_filename', 'Candidate selection'),
-                        ('localizations_filename', 'Localizing candidates'),
-                        ('linked_localizations_filename', 'Linking'),
-                        ('particles_filename', 'Relocalizing')):
-                        if os.path.exists(os.path.join(
-                            data.imFolder, getattr(data, attr, 'xNOSUCHFILE'))):
-                            fol['progress'] = prog
-                    if os.path.exists(getattr(
-                        data, 'fiducial_filter_filename', 'NOSUCHFILE')):
-                        fol['progress'] = 'Drift correction'
-                    if getattr(data, 'drift', None) != None:
-                        fol['progress'] = 'Done'
-                except IOError:
-                    fol['progress'] = ''
+##                try:
+##                    data = palm_3d.load_palm(
+##                        fol['file_prefix'] + 'palm_acquisition.pkl',
+##                        verbose=False)
+##                    fol['progress'] = 'Started'
+##                    for attr, prog in (
+##                        ('candidates_filename', 'Candidate selection'),
+##                        ('localizations_filename', 'Localizing candidates'),
+##                        ('linked_localizations_filename', 'Linking'),
+##                        ('particles_filename', 'Relocalizing')):
+##                        if os.path.exists(os.path.join(
+##                            data.imFolder, getattr(data, attr, 'xNOSUCHFILE'))):
+##                            fol['progress'] = prog
+##                    if os.path.exists(getattr(
+##                        data, 'fiducial_filter_filename', 'NOSUCHFILE')):
+##                        fol['progress'] = 'Drift correction'
+##                    if getattr(data, 'drift', None) != None:
+##                        fol['progress'] = 'Done'
+##                except IOError:
+##                    fol['progress'] = ''
                 b = tk.Label(
                     self.dataDisplay,
                     text=(fol['progress']))
@@ -326,6 +313,29 @@ class Gui:
             if metadata is not None:
                 for k, v in metadata.items():
                     fol[k] = v
+            """
+            Get progress information:
+            """
+            try:
+                data = palm_3d.load_palm(
+                    fol['file_prefix'] + 'palm_acquisition.pkl',
+                    verbose=False)
+                fol['progress'] = 'Started'
+                for attr, prog in (
+                    ('candidates_filename', 'Candidate selection'),
+                    ('localizations_filename', 'Localizing candidates'),
+                    ('linked_localizations_filename', 'Linking'),
+                    ('particles_filename', 'Relocalizing')):
+                    if os.path.exists(os.path.join(
+                        data.imFolder, getattr(data, attr, 'xNOSUCHFILE'))):
+                        fol['progress'] = prog
+                if os.path.exists(getattr(
+                    data, 'fiducial_filter_filename', 'NOSUCHFILE')):
+                    fol['progress'] = 'Drift correction'
+                if getattr(data, 'drift', None) != None:
+                    fol['progress'] = 'Done'
+            except IOError:
+                fol['progress'] = ''
         return None
 
     def get_metadata(self, folder, keys, dtype=int):
