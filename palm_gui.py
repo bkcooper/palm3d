@@ -518,6 +518,13 @@ except:
                 'maximum_z:')
         metadata = self.get_metadata(
             folder=self.experimentFolder, keys=keys, dtype=float)
+        if metadata is not None:
+            useOldMetadata = tkMessageBox.askyesnocancel(
+                title="Histogram", message="Use old parameters?")
+            if useOldMetadata is None:
+                return None
+            if not useOldMetadata:
+                metadata = None
         if metadata is None:
             self.set_metadata(
                 folder=self.experimentFolder, keys=keys,
