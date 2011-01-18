@@ -611,7 +611,8 @@ except:
         yBins=scipy.arange({minY}, {maxY}, pixels_per_bin[1]),
         zBins=scipy.arange({minZ}, {maxZ}, pixels_per_bin[2]),
         nm_per_pixel=nm_per_pixel,
-        linkedInput={linkedInput}) ##Set this
+        linkedInput={linkedInput},
+        persistent=False) ##Set this
 
     import pylab
     pylab.close('all') ##To prevent a funky Windows error message
