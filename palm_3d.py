@@ -2427,7 +2427,11 @@ class Palm_3d:
         histFile = os.path.join(self.imFolder, 'stored_histograms.pkl')
         if persistent and os.path.exists(histFile):
             print "Loading old stored histograms..."
-            stored_histograms = cPickle.load(open(histFile, 'rb'))
+            try:
+                stored_histograms = cPickle.load(open(histFile, 'rb'))
+            except IOError:
+                print "Load failed. Recomputing."
+                stored_histogram = {'input_arguments': None}
             if (stored_histograms['input_arguments'] == repr(inputArguments)):
                 if recomputeHistogram is None or recomputeHistogram =='ask':
                     print "Looks like we already computed a similar histogram."
@@ -2435,7 +2439,7 @@ class Palm_3d:
                     recomputeHistogram = raw_input()
                 if recomputeHistogram == 'y':
                     print "Recomputing histogram."
-                    os.path.remove(histFile)
+                    os.remove(histFile)
                     stored_histograms = None
                 else:
                     print "Using previously computed histogram."
