@@ -1,4 +1,4 @@
-"""Graphical user interface for palm_3d. Version 0.1.2, build 5
+"""Graphical user interface for palm_3d. Version 0.1.2, build 6
 Written by Andrew York and Kenneth Arcieri"""
 import os, re, subprocess, palm_3d
 import tkFileDialog, tkSimpleDialog, tkMessageBox, tkFont

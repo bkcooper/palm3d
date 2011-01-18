@@ -9,7 +9,7 @@ version={
     'major': 1,
     'minor': 7,
     'revision': 2,
-    'build': 3}
+    'build': 4}
 import os
 from scipy.ndimage import gaussian_laplace
 
@@ -2888,7 +2888,7 @@ def combine_palm_histograms(
         print (
             "\nAdjust (b)rightness, re-(s)lice, change (p)rojection, " +
             "change (f)ilter, toggle\n(l)og-linear, (o)utput raw data, " +
-            "or (d)one? b/s/p/f/[l]/o/d:"),
+            "output s(m)oothed data, or (d)one? b/s/p/f/[l]/o/m/d:"),
         cmd = raw_input()
         if cmd == 'b':
             print "Minimum displayed brightness [image min]:",
@@ -2962,16 +2962,33 @@ def combine_palm_histograms(
                     break
                 except IndexError:
                     print "Valid numbers are", range(len(histograms))
-        elif cmd == 'o':
+        elif cmd == 'o' or cmd == 'm':
             print "Data file name [histogram]:",
             dataFileName = raw_input()
             if dataFileName == '':
                 dataFileName = 'histogram'
-            scipy.transpose(myHist, (2,0,1)).tofile(
+            if cmd == 'm':
+                while True:
+                    print "Smoothing sigma:",
+                    sigma = raw_input()
+                    try:
+                        sigma = float(sigma)
+                        break
+                    except ValueError:
+                        print "Type a number, hit return"
+                from scipy.ndimage import gaussian_filter
+                outputMe = gaussian_filter(myHist, sigma=sigma)
+                dataType = scipy.float64
+                typeDescription = "64-bit real"
+            else:
+                outputMe = myHist
+                dataType = scipy.uint32
+                typeDescription = "32-bit unsigned"
+            scipy.transpose(outputMe, (2,0,1)).astype(dataType).tofile(
                 open(dataFileName + '.dat', 'wb'))
             dataDetails = open(dataFileName + '.txt', 'w')
             dataDetails.write(
-                "Image type: 32-bit unsigned\n" +
+                "Image type: %s\n"%(typeDescription) +
                 "Width: %i pixels (bins)\n"%(myHist.shape[1]) +
                 "Height: %i pixels (bins)\n"%(myHist.shape[0]) +
                 "Number of slices: %i\n"%(myHist.shape[2]) +
