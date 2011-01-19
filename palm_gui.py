@@ -465,8 +465,10 @@ except:
     images = [] #The list of data files
     im_z_positions = {{}} #The z-position at which each data file was taken
     num = 0
-    for f in sorted(os.listdir(im_folder)):
+    print "\\nImage files:"
+    for f in palm_3d.human_sorted(os.listdir(im_folder)):
         if os.path.splitext(f)[-1] == '.dat':
+            print f
             num += 1
             if num > 2 * repetitions:
                 print "\\nExtra images found!"
@@ -656,19 +658,15 @@ except:
                     linkedInput=str(linkedInput)))
             ipython_run('plots.py')
             return None
-    
-    def callback(self):
-        print "Called the callback"
 
-
-def human_sorted(myList): 
-  """ Sort the given list in the way that humans expect. 
-  """ 
-  def convert(text):
-      return int(text) if text.isdigit() else text 
-  def alphanum_key(key):
-      return [convert(c) for c in re.split('([0-9]+)', key)]
-  return sorted(myList, key=alphanum_key)
+def human_sorted(myList):
+    """ Sort the given list in the way that humans expect.
+    """
+    def convert(text):
+        return int(text) if text.isdigit() else text
+    def alphanum_key(key):
+        return [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(myList, key=alphanum_key)
 
 
 ## Go!
