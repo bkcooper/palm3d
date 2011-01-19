@@ -9,7 +9,7 @@ version={
     'major': 1,
     'minor': 7,
     'revision': 2,
-    'build': 4}
+    'build': 5}
 import os
 from scipy.ndimage import gaussian_laplace
 
@@ -3201,6 +3201,15 @@ def normalize_slices(data):
         mag = scipy.sqrt((abs(data_3d[:,:,whichSlice])**2).sum())
         norm_3d[:,:,whichSlice] = data_3d[:,:,whichSlice] * 1./ mag
     return norm_3d.squeeze()
+
+def human_sorted(myList): 
+  """ Sort the given list in the way that humans expect. 
+  """ 
+  def convert(text):
+      return int(text) if text.isdigit() else text 
+  def alphanum_key(key):
+      return [convert(c) for c in re.split('([0-9]+)', key)]
+  return sorted(myList, key=alphanum_key)
 
 ##def plot_cutplanes(data_3d):
 ##    from enthought.mayavi import mlab

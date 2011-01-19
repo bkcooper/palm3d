@@ -240,26 +240,7 @@ class Gui:
                 b.bind("<Return>", (
                     None, lambda e, f=fol: self.process_palm(f))[hasMetadata])
                 b.grid(row=f+2, column=4, sticky='w')
-##                try:
-##                    data = palm_3d.load_palm(
-##                        fol['file_prefix'] + 'palm_acquisition.pkl',
-##                        verbose=False)
-##                    fol['progress'] = 'Started'
-##                    for attr, prog in (
-##                        ('candidates_filename', 'Candidate selection'),
-##                        ('localizations_filename', 'Localizing candidates'),
-##                        ('linked_localizations_filename', 'Linking'),
-##                        ('particles_filename', 'Relocalizing')):
-##                        if os.path.exists(os.path.join(
-##                            data.imFolder, getattr(data, attr, 'xNOSUCHFILE'))):
-##                            fol['progress'] = prog
-##                    if os.path.exists(getattr(
-##                        data, 'fiducial_filter_filename', 'NOSUCHFILE')):
-##                        fol['progress'] = 'Drift correction'
-##                    if getattr(data, 'drift', None) != None:
-##                        fol['progress'] = 'Done'
-##                except IOError:
-##                    fol['progress'] = ''
+
                 b = tk.Label(
                     self.dataDisplay,
                     text=(fol['progress']))
@@ -282,6 +263,14 @@ class Gui:
                     command=self.construct_histogram)
                 b.bind("<Return>", self.construct_histogram)
                 b.grid(row=1, column=6, sticky='w')
+
+                b = tk.Button(
+                    self.dataDisplay,
+                    text='Invert\nselection',
+                    justify=tk.LEFT,
+                    command=self.invert_histogram_selection)
+                b.bind("<Return>", self.invert_histogram_selection)
+                b.grid(row=2+len(self.dataFolders), column=6, sticky='w')
 
         self.resize_scrollregion()
         print "Data display refreshed."
@@ -525,12 +514,24 @@ except:
         self.refresh_data_display()
         return None
 
+    def invert_histogram_selection(self, event=None):
+        for f in self.dataFolders:
+            if f.get('include_in_histogram', False): #Variable exists
+                if f.get('include_in_histogram').get(): #Variable is true
+                    f.get('include_in_histogram').set(False)
+                else:
+                    f.get('include_in_histogram').set(True)
+                print f.get('include_in_histogram').get()
+        return None
+
     def construct_histogram(self, event=None):
         acquisitions = []
         for f in self.dataFolders:
             if f.get('include_in_histogram', False): #Variable exists
                 if f.get('include_in_histogram').get(): #Variable is true
                     acquisitions.append(f)
+        if len(acquisitions) == 0:
+            return None
         acquisitionStr = ''.join(
             [' '*8 + "'" + f['file_prefix'] + "palm_acquisition.pkl',\n"
              for f in acquisitions])
