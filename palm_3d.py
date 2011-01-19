@@ -3202,14 +3202,15 @@ def normalize_slices(data):
         norm_3d[:,:,whichSlice] = data_3d[:,:,whichSlice] * 1./ mag
     return norm_3d.squeeze()
 
-def human_sorted(myList): 
-  """ Sort the given list in the way that humans expect. 
-  """ 
-  def convert(text):
+def human_sorted(myList):
+    import re
+    """ Sort the given list in the way that humans expect. 
+    """ 
+    def convert(text):
       return int(text) if text.isdigit() else text 
-  def alphanum_key(key):
+    def alphanum_key(key):
       return [convert(c) for c in re.split('([0-9]+)', key)]
-  return sorted(myList, key=alphanum_key)
+    return sorted(myList, key=alphanum_key)
 
 ##def plot_cutplanes(data_3d):
 ##    from enthought.mayavi import mlab

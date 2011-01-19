@@ -398,30 +398,37 @@ class Gui:
         """
         with open(os.path.join(calFolder, 'calibration.py'), 'wb') as calScript:
             calScript.write(
-"""import os, palm_3d
+"""try:
+    import os, palm_3d
 
-calFolder = {calFolder}
-calImages = []
-for f in sorted(os.listdir(calFolder)):
-    if os.path.splitext(f)[-1] == '.dat':
-        for i in range({imPerPos}):
-            calImages.append(f+'*%i'%(i))    
+    calFolder = {calFolder}
+    calImages = []
+    print "\\nCalibration files:"
+    for f in palm_3d.human_sorted(os.listdir(calFolder)):
+        if os.path.splitext(f)[-1] == '.dat':
+            print f
+            for i in range({imPerPos}):
+                calImages.append(f+'*%i'%(i))    
 
-data = palm_3d.new_palm(
-    images=[],
-    imFolder={experimentFolder},
-    calImages=calImages,
-    calFolder=calFolder,
-    cal_format='raw',
-    cal_xy_shape={cal_xy_shape},
-    filename_prefix = 'DELETEME_')
-data.load_calibration(
-    calibrationRepetitions={calReps},
-    calibrationImagesPerPosition={imPerPos},
-    smoothing_sigma=(1,1,5),
-    promptForSave=False)
-import pylab
-pylab.close('all') ##To prevent a funky Windows error
+    data = palm_3d.new_palm(
+        images=[],
+        imFolder={experimentFolder},
+        calImages=calImages,
+        calFolder=calFolder,
+        cal_format='raw',
+        cal_xy_shape={cal_xy_shape},
+        filename_prefix = 'DELETEME_')
+    data.load_calibration(
+        calibrationRepetitions={calReps},
+        calibrationImagesPerPosition={imPerPos},
+        smoothing_sigma=(1,1,5),
+        promptForSave=False)
+    import pylab
+    pylab.close('all') ##To prevent a funky Windows error
+except:
+    import traceback
+    traceback.print_exc()
+    raw_input()
                 """.format(
                     calFolder=repr(calFolder),
                     experimentFolder=repr(self.experimentFolder),
