@@ -376,7 +376,7 @@ class Gui:
                 return responses
         with open(os.path.join(folder, 'metadata.txt'), 'wb') as mdFile:
             for k in keys:
-                mdFile.write(k + " " + responses.get(k, '') + '\r\n')
+                mdFile.write(k + " " + responses.get(k, '') + os.linesep)
         self.refresh_data_display()
         return responses
 
@@ -434,7 +434,8 @@ except:
                     experimentFolder=repr(self.experimentFolder),
                     cal_xy_shape=(metadata['x_pixels:'], metadata['y_pixels:']),
                     calReps=metadata['calibration_repetitions:'],
-                    imPerPos=metadata['calibration_images_per_position:']))
+                    imPerPos=metadata['calibration_images_per_position:']
+                    ).replace('\n', os.linesep))
         ipython_run(os.path.join(calFolder, 'calibration.py'), waitForIt=True)
         possiblePoop = os.path.join(
             self.experimentFolder, 'DELETEME_palm_acquisition.pkl')
@@ -518,7 +519,8 @@ except:
                     repetitions=acq['repetitions:'],
                     calFolder=repr(os.path.abspath(os.path.join(
                         self.experimentFolder, self.calFolderEntry.get()))),
-                    filePrefix=repr(acq['file_prefix'])))
+                    filePrefix=repr(acq['file_prefix'])
+                    ).replace('\n', os.linesep))
         ipython_run(scriptName)
         self.refresh_data_display()
         return None
@@ -655,7 +657,8 @@ except:
                     maxY=metadata['maximum_y:'],
                     minZ=metadata['minimum_z:'],
                     maxZ=metadata['maximum_z:'],
-                    linkedInput=str(linkedInput)))
+                    linkedInput=str(linkedInput)
+                    ).replace('\n', os.linesep))
             ipython_run('plots.py')
             return None
 
