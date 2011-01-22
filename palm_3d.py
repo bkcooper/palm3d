@@ -395,27 +395,27 @@ def _localization_filter_string(
     funcNum=0, correlationMin=0):
 
     filtStr = (
-        "def locFilter%i(loc):\n"%(funcNum) +
-        "    if 'z_piezo' in loc:\n" +
-        "        if loc['z_piezo'] > %f:\n"%(piezoMax) +
-        "            return False\n" +
-        "        if loc['z_piezo'] < %f:\n"%(piezoMin) +
-        "            return False\n" +
-        "    if loc['x'] > %f:\n"%(xMax) + 
-        "        return False\n" +
-        "    if loc['x'] < %f:\n"%(xMin) +
-        "        return False\n" +
-        "    if loc['y'] > %f:\n"%(yMax) + 
-        "        return False\n" +
-        "    if loc['y'] < %f:\n"%(yMin) +
-        "        return False\n" +
-        "    if loc['z'] > %f:\n"%(zMax) + 
-        "        return False\n" +
-        "    if loc['z'] < %f:\n"%(zMin) +
-        "        return False\n" +
-        "    if loc['qual'] < %f:\n"%(correlationMin) +
-        "        return False\n" +
-        "    return True\n\n")
+        "def locFilter%i(loc):\r\n"%(funcNum) +
+        "    if 'z_piezo' in loc:\r\n" +
+        "        if loc['z_piezo'] > %f:\r\n"%(piezoMax) +
+        "            return False\r\n" +
+        "        if loc['z_piezo'] < %f:\r\n"%(piezoMin) +
+        "            return False\r\n" +
+        "    if loc['x'] > %f:\r\n"%(xMax) + 
+        "        return False\r\n" +
+        "    if loc['x'] < %f:\r\n"%(xMin) +
+        "        return False\r\n" +
+        "    if loc['y'] > %f:\r\n"%(yMax) + 
+        "        return False\r\n" +
+        "    if loc['y'] < %f:\r\n"%(yMin) +
+        "        return False\r\n" +
+        "    if loc['z'] > %f:\r\n"%(zMax) + 
+        "        return False\r\n" +
+        "    if loc['z'] < %f:\r\n"%(zMin) +
+        "        return False\r\n" +
+        "    if loc['qual'] < %f:\r\n"%(correlationMin) +
+        "        return False\r\n" +
+        "    return True\r\n\r\n")
     return filtStr
 
 def _linking_filter(loc1, loc2):
@@ -2084,10 +2084,10 @@ class Palm_3d:
                     print "Fiducials cleared."
                 fidFile = open(self.fiducial_filter_filename, 'w')
                 fidFile.write(
-                    filterDefString + 'names = [\n' + filterListString + ']' +
-                    '\n\n"""\nPossibly useful keys for custom filters:\n' +
-                    'x, y, z, qual, image_num, z_piezo\n' +
-                    'bright_flag, birth_flag, death_flag, edge_flag\n' +
+                    filterDefString + 'names = [\r\n' + filterListString + ']' +
+                    '\r\n\r\n"""\r\nPossibly useful keys for custom filters:' +
+                    '\r\nx, y, z, qual, image_num, z_piezo\r\n' +
+                    'bright_flag, birth_flag, death_flag, edge_flag\r\n' +
                     '"""')
                 fidFile.close()
                 reload(fid_filters)
