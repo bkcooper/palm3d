@@ -85,7 +85,16 @@ class Gui:
     def report_callback_exception(self, *args):
         import traceback
         err = traceback.format_exception(*args)
-        tkMessageBox.showerror('Exception', err)
+        with open(os.path.join(
+            self.experimentFolder,
+            'error_log.txt'), 'ab') as error_log:
+            for e in err:
+                error_log.write(e + os.linesep)
+            error_log.write(os.linesep*2)
+        tkMessageBox.showerror(
+            'Exception',
+            'An exception occured. ' +
+            'Read "error_log.txt" in the experiment folder for details."')
         return None
 
     def add_scrollable_root(self, root):
