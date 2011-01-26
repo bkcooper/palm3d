@@ -198,7 +198,7 @@ def _get_xy_slices(self):
             print "Type an integer, hit return."
     calibration=self.cal_load(self.calImages[cropping_frame])
     pylab.clf()
-    pylab.imshow(calibration)
+    pylab.imshow(calibration, interpolation='nearest')
     pylab.title('Click upper left and lower right to crop')
     pylab.gcf().show()
     with warnings.catch_warnings():
