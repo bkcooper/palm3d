@@ -23,6 +23,7 @@ def ipython_run(script, waitForIt=False):
 
 class Gui:
     def __init__(self, root):
+        root.report_callback_exception = self.report_callback_exception
         root.title("3D palm data processing")
         root.minsize(670, 0)
         
@@ -79,6 +80,12 @@ class Gui:
         self.select_experiment_folder()
         """Configure size of canvas's scrollable zone"""
         self.resize_scrollregion()
+        return None
+
+    def report_callback_exception(self, *args):
+        import traceback
+        err = traceback.format_exception(*args)
+        tkMessageBox.showerror('Exception', err)
         return None
 
     def add_scrollable_root(self, root):
@@ -393,6 +400,8 @@ class Gui:
         if metadata is None:
             self.set_metadata(folder=calFolder, keys=keys, defaults=defaults)
             metadata = self.get_metadata(folder=calFolder, keys=keys)
+        if metadata is None: ##The user probably canceled
+            return None
         """
         Load the calibration data:
         """
