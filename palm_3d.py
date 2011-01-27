@@ -2977,7 +2977,8 @@ def combine_palm_histograms(
                     except ValueError:
                         print "Type a number, hit return"
                 from scipy.ndimage import gaussian_filter
-                outputMe = gaussian_filter(myHist, sigma=sigma)
+                outputMe = gaussian_filter(
+                    myHist.astype(scipy.float64), sigma=sigma)
                 dataType = scipy.float64
                 typeDescription = "64-bit real"
             else:
