@@ -9,7 +9,7 @@ version={
     'major': 1,
     'minor': 7,
     'revision': 2,
-    'build': 5}
+    'build': 6}
 import os
 from scipy.ndimage import gaussian_laplace
 

@@ -1,4 +1,4 @@
-"""Graphical user interface for palm_3d. Version 0.1.2, build 6
+"""Graphical user interface for palm_3d. Version 0.1.2, build 7
 Written by Andrew York and Kenneth Arcieri"""
 import os, re, subprocess, palm_3d
 import tkFileDialog, tkSimpleDialog, tkMessageBox, tkFont
@@ -484,12 +484,16 @@ except:
     images = [] #The list of data files
     im_z_positions = {{}} #The z-position at which each data file was taken
     num = 0
+    if tracking_images_per_file > 0:
+        num_expected = 2 * repetitions
+    else:
+        num_expected = repetitions
     print "\\nImage files:"
     for f in palm_3d.human_sorted(os.listdir(im_folder)):
         if os.path.splitext(f)[-1] == '.dat':
             print f
             num += 1
-            if num > 2 * repetitions:
+            if num > num_expected:
                 print "\\nExtra images found!"
                 print "Check that 'repetitions' is correct.\\n"
                 break
@@ -501,7 +505,7 @@ except:
                 for i in range(tracking_images_per_file):
                     images.append(f+'*%i'%(i))
                     im_z_positions[images[-1]] = 0
-    if num < 2 * repetitions:
+    if num < num_expected:
         print "\\nFewer images than expected!"
         print "Check that 'repetitions' is correct.\\n"
 
