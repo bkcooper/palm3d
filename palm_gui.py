@@ -30,6 +30,7 @@ class Gui:
         """
         Make the root frame scrollable, and populate it with widgets
         """
+        self.unscrollable_root = root ##Important for tkSimpleDialog
         self.add_scrollable_root(root)
         self.root.update_idletasks()
         """
@@ -387,7 +388,8 @@ class Gui:
         for k in keys:
             responses[k] = tkSimpleDialog.askstring(
                 title=os.path.split(folder)[-1], prompt=k,
-                initialvalue=str(defaults.get(k, '')), parent=self.root)
+                initialvalue=str(defaults.get(k, '')),
+                parent=self.unscrollable_root)
             if responses[k] is None:
                 return responses
         with open(os.path.join(folder, 'metadata.txt'), 'wb') as mdFile:
