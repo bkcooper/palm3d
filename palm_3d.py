@@ -1314,6 +1314,7 @@ class Palm_3d:
         """Keep track of how many localized particles."""
         localizations['num'] = 0
         localizations['initial_upsample'] = initial_upsample
+        num_abandoned = 0
 
         smoothingWindow = _smoothing_window(self.calibration.shape)
         calibrationFT = ( #FFT normalization is funny
@@ -1417,7 +1418,8 @@ class Palm_3d:
                         break
                 if 'edge_flag' in loc:
                     if loc['edge_flag'] and not retainEdgeFlags:
-                        locList[whichLoc]=loc
+                        locList[whichLoc] = loc
+                        num_abandoned += 1
                         continue
                 """Correlation shifts are periodic:"""
                 wrapLength = scipy.array(correlationsFT.shape[0:2] + (0,))//2
@@ -1483,8 +1485,9 @@ class Palm_3d:
         if verbose:
             sys.stdout.write("\rCandidates processed:%7d/%d"%(
                 whichCandidate+1, candidates['num']))
-            print "\nCalibration stack shape: ", calibrationFT.shape
-            print "Particle image shape: ", locImageFT.shape
+            print "\nAbandoned candidates: ", num_abandoned
+##            print "Calibration stack shape: ", calibrationFT.shape
+##            print "Particle image shape: ", locImageFT.shape
         candidates.close()
         localizations.close()
         if promptForInspection:
@@ -1776,6 +1779,7 @@ class Palm_3d:
         currentImage = 0
         localizations_cache = {}
         (numOrphanBirths, numOrphanDeaths, numOrphanBrights) = (0, 0, 0)
+        (numLinkedBirths, numLinkedDeaths, numLinkedBrights) = (0, 0, 0)
         while currentImage < len(self.images):
             """Get the current-image locs from the cache, load if required:"""
             currentLocs = localizations_cache.pop(
@@ -1814,6 +1818,13 @@ class Palm_3d:
                 searchImage += 1
             linkedImageLocs = []
             for matches in matchesList:
+                for loc in matches:
+                    if 'birth_flag' in loc:
+                        numLinkedBirths += 1
+                    elif 'bright_flag' in loc:
+                        numLinkedBrights += 1
+                    elif 'death_flag' in loc:
+                        numLinkedDeaths += 1
                 linkedLoc = {'image_name': matches[0]['image_name'],
                              'x_slice': matches[0]['x_slice'],
                              'y_slice': matches[0]['y_slice'],
@@ -1844,14 +1855,25 @@ class Palm_3d:
                 linked_localizations.sync()
                 sys.stdout.write(
                     "\r%7d remaining localizations"%(
-                        localizations['num'] - linked_localizations['num'] -
+                        localizations['num'] -
+                        numLinkedBrights - numLinkedBirths - numLinkedDeaths -
                         numOrphanBrights - numOrphanBirths - numOrphanDeaths))
                 sys.stdout.flush()
+        linked_localizations.sync()
+        sys.stdout.write(
+            "\r%7d remaining localizations"%(
+                localizations['num'] -
+                numLinkedBrights - numLinkedBirths - numLinkedDeaths -
+                numOrphanBrights - numOrphanBirths - numOrphanDeaths))
+        sys.stdout.flush()
         print "\n%i localizations linked into %i logical particles."%(
             localizations['num'], linked_localizations['num'])
-        print "%i orphaned bright localizations"%(numOrphanBrights)
-        print "%i orphaned birth localizations"%(numOrphanBirths)
-        print "%i orphaned death localizations"%(numOrphanDeaths)
+        print "%i linked, %i orphaned bright localizations"%(
+            numLinkedBrights, numOrphanBrights)
+        print "%i linked, %i orphaned birth localizations"%(
+            numLinkedBirths, numOrphanBirths)
+        print "%i linked, %i orphaned death localizations"%(
+            numLinkedDeaths, numOrphanDeaths)
         localizations.close()
         linked_localizations.close()
         localizations = None ##Prevents a funky error message, sometimes
