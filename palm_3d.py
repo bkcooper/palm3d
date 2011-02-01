@@ -1792,11 +1792,23 @@ class Palm_3d:
                     numOrphanBrights += 1
                 elif 'death_flag' in loc:
                     numOrphanDeaths += 1
+                else:
+                    raise UserWarning("Unlabeled localization!")
             matchesList = []
             searchImage = currentImage + 1
             """Search for matches to each birthLoc, retiring birthLocs
             when they get 'cold' or find a death:"""
-            while (len(birthLocs) > 0) and (searchImage < len(self.images)):
+            while (len(birthLocs) > 0):
+                if searchImage >= len(self.images):
+                    for b in birthLocs:
+                        for loc in b:
+                            if 'birth_flag' in loc:
+                                numOrphanBirths += 1
+                            elif 'bright_flag' in loc:
+                                numOrphanBrights += 1
+                            elif 'death_flag' in loc:
+                                numOrphanDeaths += 1
+                    break
                 searchLocs = localizations_cache.setdefault(
                     repr(searchImage), localizations[repr(searchImage)])
                 for matches in birthLocs:
@@ -1808,7 +1820,14 @@ class Palm_3d:
                 orphanBirths = [
                     matches for matches in birthLocs if
                     matches[-1]['image_num'] + maxSearchFrames < searchImage]
-                numOrphanBirths += len(orphanBirths)
+                for b in orphanBirths:
+                    for loc in b:
+                        if 'birth_flag' in loc:
+                            numOrphanBirths += 1
+                        elif 'bright_flag' in loc:
+                            numOrphanBrights += 1
+                        elif 'death_flag' in loc:
+                            numOrphanDeaths += 1
                 doneMatches = [
                     matches for matches in birthLocs if
                     ('death_flag' in matches[-1]) or fidFilter(matches)]
