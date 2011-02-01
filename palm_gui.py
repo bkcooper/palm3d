@@ -25,7 +25,7 @@ class Gui:
     def __init__(self, root):
         root.report_callback_exception = self.report_callback_exception
         root.title("3D palm data processing")
-        root.minsize(670, 0)
+        root.minsize(680, 0)
         
         """
         Make the root frame scrollable, and populate it with widgets
@@ -57,6 +57,7 @@ class Gui:
         b.grid()
         self.calFolderEntry = tk.StringVar()
         b = tk.Entry(self.root, textvariable=self.calFolderEntry)
+        b.bind("<Return>", self.refresh_data_display)
         self.calFolderEntry.set("calibration")
         b.grid(row=2, column=1)
 
@@ -64,6 +65,7 @@ class Gui:
         b.grid()
         self.dataPrefixEntry = tk.StringVar()
         b = tk.Entry(self.root, textvariable=self.dataPrefixEntry)
+        b.bind("<Return>", self.refresh_data_display)
         self.dataPrefixEntry.set("z=")
         b.grid(row=3, column=1)
 
@@ -271,11 +273,19 @@ class Gui:
                         self.dataDisplay,
                         variable=fol['include_in_histogram'])
                     b.grid(row=f+2, column=6, sticky='w')
+                    
+##                    b = tk.Button(
+##                        self.dataDisplay,
+##                        text='?',
+##                        justify=tk.LEFT,
+##                        command=(
+##                            lambda f=fol: self.inspection(f)))
+##                    b.grid(row=f+2, column=7, sticky='w')
             if anyFinished:
                 b = tk.Button(
                     self.dataDisplay,
                     text='Construct\nhistogram',
-                    font=tkFont.Font(size=9, weight=tkFont.BOLD),
+                    font=tkFont.Font(size=6, weight=tkFont.BOLD),
                     justify=tk.LEFT,
                     command=self.construct_histogram)
                 b.bind("<Return>", self.construct_histogram)
@@ -284,6 +294,7 @@ class Gui:
                 b = tk.Button(
                     self.dataDisplay,
                     text='Invert\nselection',
+                    font=tkFont.Font(size=6, weight=tkFont.BOLD),
                     justify=tk.LEFT,
                     command=self.invert_histogram_selection)
                 b.bind("<Return>", self.invert_histogram_selection)
@@ -310,9 +321,12 @@ class Gui:
             human_sorted(os.listdir(self.experimentFolder))
             if (os.path.isdir(folder) and
                 folder.startswith(self.dataPrefixEntry.get()))]
+        goodFilenames = True
         for fol in self.dataFolders:
             fol["file_prefix"] = (
                 fol["folder"].lstrip(self.dataPrefixEntry.get()) + '_')
+            if not fol["file_prefix"].replace('_', '').isalnum():
+                goodFilenames = False
             """
             Get metadata:
             """
@@ -361,6 +375,12 @@ class Gui:
                 fol['progress'] = 'Drift correction'
             if getattr(data, 'drift', None) != None:
                 fol['progress'] = 'Done'
+        if not goodFilenames:
+            tkMessageBox.showerror(
+                'Warning',
+                'At least one file prefix has characters that are neither' +
+                ' alphanumeric nor underscores. Change the offending' +
+                ' acquisition folder name.')
         return None
 
     def get_metadata(self, folder, keys, dtype=int):
@@ -556,7 +576,6 @@ except:
                     f.get('include_in_histogram').set(False)
                 else:
                     f.get('include_in_histogram').set(True)
-                print f.get('include_in_histogram').get()
         return None
 
     def construct_histogram(self, event=None):
@@ -685,6 +704,10 @@ except:
                     ).replace('\n', os.linesep))
             ipython_run('plots.py')
             return None
+
+##    def inspection(self, fol):
+##        print fol
+##        return None
 
 def human_sorted(myList):
     """ Sort the given list in the way that humans expect.
