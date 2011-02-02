@@ -1,4 +1,4 @@
-"""Graphical user interface for palm_3d. Version 0.1.2, build 7
+"""Graphical user interface for palm_3d. Version 0.1.2, build 8
 Written by Andrew York and Kenneth Arcieri"""
 import os, re, subprocess, palm_3d
 import tkFileDialog, tkSimpleDialog, tkMessageBox, tkFont
@@ -31,6 +31,8 @@ class Gui:
         Make the root frame scrollable, and populate it with widgets
         """
         self.unscrollable_root = root ##Important for tkSimpleDialog
+        self.unscrollable_root.bind("<Control-q>",
+                                    lambda e: self.unscrollable_root.destroy())
         self.add_scrollable_root(root)
         self.root.update_idletasks()
         """
