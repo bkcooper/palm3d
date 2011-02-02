@@ -25,7 +25,7 @@ class Gui:
     def __init__(self, root):
         root.report_callback_exception = self.report_callback_exception
         root.title("3D palm data processing")
-        root.minsize(680, 0)
+        root.minsize(650, 0)
         
         """
         Make the root frame scrollable, and populate it with widgets
@@ -47,7 +47,6 @@ class Gui:
 
         b = tk.Button(
             self.root, text="Select", command=self.select_experiment_folder)
-        b.focus_set()
         b.bind("<Return>", self.select_experiment_folder)
         b.grid(row=0, column=2, rowspan=2)
         """
@@ -58,6 +57,7 @@ class Gui:
         self.calFolderEntry = tk.StringVar()
         b = tk.Entry(self.root, textvariable=self.calFolderEntry)
         b.bind("<Return>", self.refresh_data_display)
+        self.unscrollable_root.bind("<Control-r>", self.refresh_data_display)
         self.calFolderEntry.set("calibration")
         b.grid(row=2, column=1)
 
@@ -120,11 +120,11 @@ class Gui:
         hScroll = tk.Scrollbar(
             root, orient=tk.HORIZONTAL, command=self.cnv.xview)
         hScroll.grid(row=1, column=0, sticky='we')
-        vScroll = tk.Scrollbar(
+        self.vScroll = tk.Scrollbar(
             root, orient=tk.VERTICAL, command=self.cnv.yview)
-        vScroll.grid(row=0, column=1, sticky='ns')
+        self.vScroll.grid(row=0, column=1, sticky='ns')
         self.cnv.configure(
-            xscrollcommand=hScroll.set, yscrollcommand=vScroll.set)
+            xscrollcommand=hScroll.set, yscrollcommand=self.vScroll.set)
         """Frame in canvas is now scrollable - pretend it's the root window"""
         self.root = tk.Frame(self.cnv)
         self.cnv.create_window(0, 0, window=self.root, anchor='nw')
@@ -243,26 +243,34 @@ class Gui:
                     'x_pixels:' and 'y_pixels:' in fol)
                 if hasMetadata:
                     metadataDefaults = fol
+                k = ['slice_z_position:', 'repetitions:',
+                     'slice_images_per_file:', 'tracking_images_per_file:',
+                     'x_pixels:', 'y_pixels:']
                 b = tk.Button(
                     self.dataDisplay,
                     text=("Set metadata", "Process")[hasMetadata],
                     command=(
                         lambda f=fol, m=metadataDefaults: self.set_metadata(
-                            folder=f['folder'],
-                            keys=['slice_z_position:', 'repetitions:',
-                                  'slice_images_per_file:',
-                                  'tracking_images_per_file:',
-                                  'x_pixels:', 'y_pixels:'],
-                            defaults=m),
+                            folder=f['folder'], keys=k, defaults=m),
                         lambda f=fol: self.process_palm(f))[hasMetadata],
                     state=(tk.DISABLED, tk.NORMAL)[self.calLoaded])
                 b.bind("<Return>", (
-                    None, lambda e, f=fol: self.process_palm(f))[hasMetadata])
+                    lambda e, f=fol, m=metadataDefaults: self.set_metadata(
+                        folder=f['folder'], keys=k, defaults=m),
+                    lambda e, f=fol: self.process_palm(f))[hasMetadata])
                 b.grid(row=f+2, column=4, sticky='w')
 
-                b = tk.Label(
-                    self.dataDisplay,
-                    text=(fol['progress']))
+                if fol.get('progress', None) == 'Done':
+                    b = tk.Button(
+                        self.dataDisplay,
+                        text='Done',
+                        justify=tk.LEFT,
+                        command=(lambda f=fol: self.inspection(f)))
+                    b.bind("<Return>", lambda e, f=fol: self.inspection(f))
+                else:
+                    b = tk.Label(
+                        self.dataDisplay,
+                        text=(fol['progress']))
                 b.grid(row=f+2, column=5, sticky='w')
 
                 if fol['progress'] == 'Done':
@@ -274,13 +282,6 @@ class Gui:
                         variable=fol['include_in_histogram'])
                     b.grid(row=f+2, column=6, sticky='w')
                     
-##                    b = tk.Button(
-##                        self.dataDisplay,
-##                        text='?',
-##                        justify=tk.LEFT,
-##                        command=(
-##                            lambda f=fol: self.inspection(f)))
-##                    b.grid(row=f+2, column=7, sticky='w')
             if anyFinished:
                 b = tk.Button(
                     self.dataDisplay,
@@ -301,6 +302,7 @@ class Gui:
                 b.grid(row=2+len(self.dataFolders), column=6, sticky='w')
 
         self.resize_scrollregion()
+        self.vScroll.focus_set()
         print "Data display refreshed."
         return None
 
@@ -705,9 +707,75 @@ except:
             ipython_run('plots.py')
             return None
 
-##    def inspection(self, fol):
-##        print fol
-##        return None
+    def inspection(self, acq):
+        """Inspect processed data."""
+        acq_file = acq['file_prefix'] + 'palm_acquisition.pkl'
+        scriptName = os.path.join(acq['folder'], 'inspection.py')
+        """
+        What does the user want to inspect?
+        """
+        choices = ('Inspect\ncandidate selection', 'Inspect localizations',
+                   'Inspect linking', 'Inspect\nlinked localizations')
+        methods = dict(zip(
+            choices, (
+                'inspect_candidate_selection()',
+                'inspect_localizations()',
+                'inspect_linking()',
+                'inspect_localizations(linkedInput=True)')))
+        choice = MultiButtonDialog(
+            parent=self.unscrollable_root, title='Info', choices=choices).result
+        print choice
+        if choice is None:
+            return None
+        """
+        Write the inspection script:
+        """
+        with open(scriptName, 'wb') as inspScript:
+            inspScript.write(
+"""try:
+    import palm_3d
+
+    data = palm_3d.load_palm({acq_file})
+    data.{inspection_method}
+    import pylab
+    pylab.close('all') ##To prevent a funky Windows error message
+    raw_input("Hit enter to exit...")
+except:
+    import traceback
+    traceback.print_exc()
+    raw_input()
+                """.format(
+                    acq_file=repr(acq_file),
+                    inspection_method=methods[choice]
+                    ).replace('\n', os.linesep))
+        ipython_run(scriptName)
+        self.refresh_data_display()
+        return None
+
+class MultiButtonDialog(tkSimpleDialog.Dialog):
+    """Like askyesno, but with more choices. The answer goes in self.result."""
+    def __init__(self, parent, title=None, choices=None, button_width=15):
+        """'choices' should be a list of strings."""
+        self.choices = choices
+        self.width = button_width
+        tkSimpleDialog.Dialog.__init__(self, parent, title)
+        return None
+    def buttonbox(self):
+        # Override the standard buttons
+        box = tk.Frame(self)
+        def set_result(result, event=None):
+            self.result = result
+            self.cancel()
+        for c in self.choices:
+            b = tk.Button(box, text=c, width=self.width,
+                          command=lambda c=c: set_result(c))
+            b.bind("<Return>", lambda e, c=c: set_result(c))
+            b.pack()
+        b = tk.Button(box, text="Cancel", width=10, command=self.cancel)
+        b.pack()
+        self.bind("<Escape>", self.cancel)
+        box.pack()
+        return None
 
 def human_sorted(myList):
     """ Sort the given list in the way that humans expect.
