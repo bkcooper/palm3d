@@ -395,27 +395,32 @@ def _localization_filter_string(
     funcNum=0, correlationMin=0):
 
     filtStr = (
-        "def locFilter%i(loc):\n"%(funcNum) +
-        "    if 'z_piezo' in loc:\n" +
-        "        if loc['z_piezo'] > %f:\n"%(piezoMax) +
-        "            return False\n" +
-        "        if loc['z_piezo'] < %f:\n"%(piezoMin) +
-        "            return False\n" +
-        "    if loc['x'] > %f:\n"%(xMax) + 
-        "        return False\n" +
-        "    if loc['x'] < %f:\n"%(xMin) +
-        "        return False\n" +
-        "    if loc['y'] > %f:\n"%(yMax) + 
-        "        return False\n" +
-        "    if loc['y'] < %f:\n"%(yMin) +
-        "        return False\n" +
-        "    if loc['z'] > %f:\n"%(zMax) + 
-        "        return False\n" +
-        "    if loc['z'] < %f:\n"%(zMin) +
-        "        return False\n" +
-        "    if loc['qual'] < %f:\n"%(correlationMin) +
-        "        return False\n" +
-        "    return True\n\n").replace('\n', os.linesep)
+        """def locFilter{funcNum}(loc):
+    if 'z_piezo' in loc:
+        if loc['z_piezo'] > {piezoMax:f}:
+            return False
+        if loc['z_piezo'] < {piezoMin:f}:
+            return False
+    if loc['x'] > {xMax:f}:
+        return False
+    if loc['x'] < {xMin:f}:
+        return False
+    if loc['y'] > {yMax:f}:
+        return False
+    if loc['y'] < {yMin:f}:
+        return False
+    if loc['z'] > {zMax:f}:
+        return False
+    if loc['z'] < {zMin:f}:
+        return False
+    if loc['qual'] < {correlationMin:f}:
+        return False
+    return True
+
+"""
+        ).format(funcNum=funcNum, piezoMax=piezoMax, piezoMin=piezoMin,
+                 xMax=xMax, xMin=xMin, yMax=yMax, yMin=yMin,
+                 zMax=zMax, zMin=zMin, correlationMin=correlationMin)
     return filtStr
 
 def _linking_filter(loc1, loc2):
@@ -2076,7 +2081,7 @@ class Palm_3d:
                 return None
             else:
                 print "Removing old fiducial selections."
-        fidFile = open(self.fiducial_filter_filename, 'w')
+        fidFile = open(self.fiducial_filter_filename, 'wb')
         fidFile.write("names = []")
         fidFile.close()
         fid_filters = __import__(
@@ -2123,13 +2128,19 @@ class Palm_3d:
                     filterDefString = ""
                     filterListString = ""
                     print "Fiducials cleared."
-                fidFile = open(self.fiducial_filter_filename, 'w')
-                fidFile.write(
-                    filterDefString + 'names = [\r\n' + filterListString + ']' +
-                    '\r\n\r\n"""\r\nPossibly useful keys for custom filters:' +
-                    '\r\nx, y, z, qual, image_num, z_piezo\r\n' +
-                    'bright_flag, birth_flag, death_flag, edge_flag\r\n' +
-                    '"""')
+                fidFile = open(self.fiducial_filter_filename, 'wb')
+                fidFile.write("""{filterDefString:s}
+
+names = [
+{filterListString}]
+
+\"\"\"
+Possibly useful keys for custom filters:
+x, y, z, qual, image_num, z_piezo
+'bright_flag, birth_flag, death_flag, edge_flag
+\"\"\"
+""".format(filterDefString=filterDefString, filterListString=filterListString
+           ).replace('\n', os.linesep))
                 fidFile.close()
                 reload(fid_filters)
                 bytecodeFilename = self.fiducial_filter_filename + 'c'
