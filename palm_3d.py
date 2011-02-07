@@ -9,7 +9,7 @@ version={
     'major': 1,
     'minor': 7,
     'revision': 2,
-    'build': 7}
+    'build': 8}
 import os
 from scipy.ndimage import gaussian_laplace
 
@@ -1216,8 +1216,8 @@ class Palm_3d:
                 showResults=True)
             pylab.gcf().show()
             pylab.ion()
-            print "Continue, jump images, new parameters,",
-            print "or finished testing? [c]/j/n/f:",
+            print "(c)ontinue, (j)ump images, (n)ew parameters,",
+            print "or (f)inished testing? [c]/j/n/f:",
             cmd = raw_input()
             if cmd == 'f':
                 break
