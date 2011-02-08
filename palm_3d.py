@@ -2791,6 +2791,7 @@ def combine_palm_histograms(
     persistentWarning=True,
     recomputeHistograms=False,
     promptForDisplay=True,
+    memoryWarning=True,
     linkedInput=False):
 
     """
@@ -2837,7 +2838,6 @@ def combine_palm_histograms(
             initialFiducialXYZ = scipy.array(data.drift['initial_xyz'])
         initialOffset = initialFiducialXYZ - data.drift['initial_xyz']
         print "Initial offset:", initialOffset
-        memoryWarning = True
         if a > 0:
             memoryWarning = False
         histograms = data.histogram_3d(
