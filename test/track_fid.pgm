@@ -1,0 +1,21 @@
+slicePosition= 0 // x100nm
+repetitions=50
+sliceshots=200 //<4000 frames at 512 by 512 to fit in a 4GB .sif
+fidshots=20
+
+
+//Don't change below this line
+slicePosition$=str$(slicePosition)
+fidPosition$=str$(0)
+piezo$ = "C:\Python26\pythonw.exe ";chr$(34);"C:\Documents and Settings\User\My Documents\andor_scripts\piezo.py";chr$(34);" "
+for i = 1 to repetitions
+	execute(piezo$;slicePosition$)
+	SetKineticNumber(sliceshots)
+	delay(200)
+	run()
+	execute(piezo$;fidPosition$)
+	SetKineticNumber(fidshots)
+	delay(200)
+	run()
+next
+write("C:\Documents and Settings\User\My Documents\andor_scripts\andor_messages.txt", "slice_position: ";slicePosition$;" repetitions: ";str$(repetitions);" slice_shots: ";str$(sliceshots);" fiducial_shots: ";str$(fidshots))
