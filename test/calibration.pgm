@@ -1,0 +1,14 @@
+piezo$ = "C:\Python26\pythonw.exe ";chr$(34);"C:\Documents and Settings\User\My Documents\andor_scripts\piezo.py";chr$(34);" "
+for j = 0 to 1
+	for i =-20. to 20. step 0.5 //x100 nm
+		slicePosition$ = str$(i)
+		execute(piezo$;slicePosition$)
+		delay(100)
+		SetKineticNumber(10)
+		run()
+	next
+next
+slicePosition$ = str$(0)
+execute(piezo$;slicePosition$)
+write("C:\Documents and Settings\User\My Documents\andor_scripts\andor_messages.txt", "calibration")
+execute("C:\Python26\python.exe ";chr$(34);"C:\Python26\Scripts\ipython";chr$(34);" -pylab ";chr$(34);"C:\Documents and Settings\User\My Documents\andor_scripts\process_palm.py";chr$(34))
