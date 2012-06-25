@@ -1,0 +1,22 @@
+xystage$ = "C:\Python26\pythonw.exe ";chr$(34);"C:\Documents and Settings\User\My Documents\andor_scripts\xy_stage.py";chr$(34);" "
+//SetKineticNumber(1)
+//Watch out! Serial port x-moves flip sign on the ASI box.
+//Anti-backlash movement:
+execute(xystage$;"-100 100")
+delay(500)
+execute(xystage$;"100 -100")
+delay(500)
+for y = 1 to 5
+	for x = 1 to 5
+		run()
+		execute(xystage$;"30 0")
+		delay(500)
+	next
+	execute(xystage$;"-300 0")
+	delay(500)
+	execute(xystage$;"150 -30")
+	delay(500)
+next
+execute(xystage$;"0 300")
+delay(500)
+execute(xystage$;"0 -150")
