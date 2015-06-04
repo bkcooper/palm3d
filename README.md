@@ -6,11 +6,11 @@ Fluorescence microscopes are an awesome tool for biologists, but get blurry if y
 
 A drawback of this trick is that the raw data from your microscope looks like gibberish:
 
-<wiki:video url="http://www.youtube.com/watch?v=ffFDMgxcC_8"/>
+[![](http://img.youtube.com/vi/ffFDMgxcC_8/0.jpg)](http://www.youtube.com/watch?v=ffFDMgxcC_8)
 
 You need software to turn this data into a three-dimensional image like this one:
 
-<wiki:video url="http://www.youtube.com/watch?v=yEM4gwMavKI"/>
+[![](http://img.youtube.com/vi/yEM4gwMavKI/0.jpg)](http://www.youtube.com/watch?v=yEM4gwMavKI)
 
 That's what 'palm3d' does.
 
