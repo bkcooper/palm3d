@@ -1,6 +1,7 @@
-=News=
-Have you tried out palm3d? We'd love to hear how it went. We need [http://www.nibib.nih.gov/Research/Intramural/HighResolutionOpticalImaging/York your feedback] to make sure the software works on everyone's data, not just ours. 
-=Introduction=
+## News
+Have you tried out palm3d? We'd love to hear how it went. We need [http://www.nibib.nih.gov/Research/Intramural/HighResolutionOpticalImaging/York your feedback] to make sure the software works on everyone's data, not just ours.
+
+## Introduction
 Fluorescence microscopes are an awesome tool for biologists, but get blurry if you zoom in too much. It turns out you can remove a lot of this blur if your fluorescent molecules glow one at a time. (See [http://www.ncbi.nlm.nih.gov/pubmed/16902090 PALM], [http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2700296/ STORM], [http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1635685/ FPALM] for examples).
 
 A drawback of this trick is that the raw data from your microscope looks like gibberish:
@@ -13,10 +14,10 @@ You need software to turn this data into a three-dimensional image like this one
 
 That's what 'palm3d' does.
 
-=Getting started=
+## Getting started
 Start with our step-by-step [http://code.google.com/p/palm3d/wiki/Tutorial tutorial]. After you're used to the code, try processing some of your [http://code.google.com/p/palm3d/wiki/TakingData own data], and let us know how it goes.
 
-=Why use palm3d?=
+## Why use palm3d?
 Other software exists to do the same thing. For example, [http://code.google.com/p/quickpalm/ QuickPALM] is an excellent project that tackles a similar problem. 'palm3d' tries to be hardware-agnostic and reasonably fast, with a focus on three-dimensional super-resolution imaging. 
 
 We developed palm3d while PALM-imaging [http://dx.doi.org/10.1038/nmeth.1571 thick cells] tagged with fluorescent proteins. palm3d overcomes many difficulties presented by these samples:
@@ -24,11 +25,11 @@ We developed palm3d while PALM-imaging [http://dx.doi.org/10.1038/nmeth.1571 thi
   * Drift tracking is difficult in thick samples, but palm3d corrects drift using a [http://code.google.com/p/palm3d/wiki/TakingData#Taking_PALM_data_the_flexible_way simple trick].
   * Genetically expressed fluorescent proteins are dim compared to other PALM/STORM tags, and thick samples give noisy images due to autofluorescence. We've tested palm3d in samples up to ~10 microns thick, and it works well with fluorescent proteins.
 
-=What hardware do I need?=
-==Short answer==
+## What hardware do I need?
+### Short answer
 A scope that can do 2D PALM/STORM, with a precise axial sample positioner.
 
-==Long answer==
+### Long answer
 [http://dx.doi.org/10.1038/nmeth.1571 Read our paper], where we describe how to build a 3D PALM for thick samples. If you build the same scope, it should work for samples thicker than 10 microns, tagged with two-photon activatable fluorophores. We've had the best luck with PA-mCherry, but we suspect there are other good two-photon activatable fluorophores. Let us know what you try!
 
 If you don't have a femtosecond laser, or don't want to use two-photon activatable fluorophores, you can use one-photon activation instead. One-photon activation works great for thin samples (~1 micron or less), and should be ok even for moderately thick samples (~3 microns).
